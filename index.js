@@ -25,10 +25,10 @@ export async function connectToMongoDB() {
 }
 
 // connect to mongodb and get the collections
-// const mongoClient = await connectToMongoDB();
-// const database = mongoClient.db("studio-space");
-// const studiosCollection = database.collection("studios");
-// const categoriesCollection = database.collection("categories");
+const mongoClient = await connectToMongoDB();
+const database = mongoClient.db("studio-space");
+const studiosCollection = database.collection("studios");
+const categoriesCollection = database.collection("categories");
 
 // verify token
 
@@ -38,12 +38,12 @@ app.get("/", async (req, res) => {
 });
 
 // add-studio route
-// app.post("/add-studio", async (req, res) => {
-//   const studio = req.body;
-//   const result = await studiosCollection.insertOne(studio);
-//   console.log(result);
-//   res.send(result);
-// });
+app.post("/add-studio", async (req, res) => {
+  const studio = req.body;
+  const result = await studiosCollection.insertOne(studio);
+  console.log(result);
+  res.send(result);
+});
 
 // get all studio
 // app.get("/studios", async (req, res) => {
