@@ -75,6 +75,18 @@ app.get("/categories", async (req, res) => {
   res.send(categories);
 });
 
+// get studio by categories
+app.get("/categories/:category", async (req, res) => {
+  const rawCategory = req.params.category;
+
+  const query = {
+    category: { $regex: new RegExp(`^${rawCategory}$`, "i") },
+  };
+  console.log("Query:", query);
+  const studio = await studiosCollection.find(query).toArray();
+  res.send(studio);
+});
+
 // app listen port
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
