@@ -46,11 +46,11 @@ app.post("/add-studio", async (req, res) => {
 });
 
 // get all studio
-// app.get("/studios", async (req, res) => {
-//   const cursor = studiosCollection.find({});
-//   const studios = await cursor.toArray();
-//   res.send(studios);
-// });
+app.get("/studios", async (req, res) => {
+  const cursor = studiosCollection.find({});
+  const studios = await cursor.toArray();
+  res.send(studios);
+});
 
 // get featured studios
 // app.get("/featured-studios", async (req, res) => {
