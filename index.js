@@ -53,18 +53,18 @@ app.get("/studios", async (req, res) => {
 });
 
 // get featured studios
-// app.get("/featured-studios", async (req, res) => {
-//   const cursor = studiosCollection.find({});
-//   const featuredStudios = await cursor.limit(6).toArray();
-//   res.send(featuredStudios);
-// });
+app.get("/featured-studios", async (req, res) => {
+  const cursor = studiosCollection.find({});
+  const featuredStudios = await cursor.limit(6).toArray();
+  res.send(featuredStudios);
+});
 
 // get categoires route
-// app.get("/categories", async (req, res) => {
-//   const cursor = categoriesCollection.find({});
-//   const categories = await cursor.toArray();
-//   res.send(categories);
-// });
+app.get("/categories", async (req, res) => {
+  const cursor = categoriesCollection.find({});
+  const categories = await cursor.toArray();
+  res.send(categories);
+});
 
 // app listen port
 app.listen(port, () => {
