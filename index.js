@@ -52,6 +52,15 @@ app.get("/studios", async (req, res) => {
   res.send(studios);
 });
 
+// get studio by id
+app.get("/studios/:id", async (req, res) => {
+  const { id } = req.params;
+  const studio = await studiosCollection.findOne({
+    _id: new ObjectId(id),
+  });
+  res.send(studio);
+});
+
 // get featured studios
 app.get("/featured-studios", async (req, res) => {
   const cursor = studiosCollection.find({});
