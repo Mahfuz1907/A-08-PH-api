@@ -29,6 +29,7 @@ const mongoClient = await connectToMongoDB();
 const database = mongoClient.db("studio-space");
 const studiosCollection = database.collection("studios");
 const categoriesCollection = database.collection("categories");
+const bookingsCollection = database.collection("bookings");
 
 // verify token
 
@@ -114,6 +115,13 @@ app.get("/categories", async (req, res) => {
   const cursor = categoriesCollection.find({});
   const categories = await cursor.toArray();
   res.send(categories);
+});
+
+// post bookings
+app.post("/add-bookings", async (req, res) => {
+  const booking = req.body;
+  const result = await bookingsCollection.insertOne(booking);
+  res.send(result);
 });
 
 // app listen port
