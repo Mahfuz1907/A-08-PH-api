@@ -61,6 +61,13 @@ app.get("/studios/:id", async (req, res) => {
   res.send(studio);
 });
 
+// get studio by email
+app.get("/studios/email/:email", async (req, res) => {
+  const { email } = req.params;
+  const studio = await studiosCollection.find({ hostEmail: email }).toArray();
+  res.send(studio);
+});
+
 // get featured studios
 app.get("/featured-studios", async (req, res) => {
   const cursor = studiosCollection.find({});
@@ -73,18 +80,6 @@ app.get("/categories", async (req, res) => {
   const cursor = categoriesCollection.find({});
   const categories = await cursor.toArray();
   res.send(categories);
-});
-
-// get studio by categories
-app.get("/categories/:category", async (req, res) => {
-  const rawCategory = req.params.category;
-
-  const query = {
-    category: { $regex: new RegExp(`^${rawCategory}$`, "i") },
-  };
-  console.log("Query:", query);
-  const studio = await studiosCollection.find(query).toArray();
-  res.send(studio);
 });
 
 // app listen port
