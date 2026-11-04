@@ -124,6 +124,22 @@ app.post("/add-bookings", async (req, res) => {
   res.send(result);
 });
 
+// get bookings
+app.get("/bookings", async (req, res) => {
+  const cursor = bookingsCollection.find({});
+  const bookings = await cursor.toArray();
+  res.send(bookings);
+});
+
+// get bookings by id
+app.get("/bookings/:id", async (req, res) => {
+  const { id } = req.params;
+  const booking = await bookingsCollection.findOne({
+    _id: new ObjectId(id),
+  });
+  res.send(booking);
+});
+
 // app listen port
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
