@@ -68,6 +68,40 @@ app.get("/studios/email/:email", async (req, res) => {
   res.send(studio);
 });
 
+// edit studio
+app.put("/studios/edit/:id", async (req, res) => {
+  const { id } = req.params;
+  const updatedData = req.body;
+
+  const filter = { _id: new ObjectId(id) };
+
+  const updateDoc = {
+    $set: {
+      title: updatedData.title,
+      category: updatedData.category,
+      "hourly-rate": updatedData["hourly-rate"],
+      securityDeposit: updatedData.securityDeposit,
+      maxCapacity: updatedData.maxCapacity,
+      location: updatedData.location,
+      imageUrl: updatedData.imageUrl,
+      amenities: updatedData.amenities,
+      description: updatedData.description,
+    },
+  };
+
+  const result = await studiosCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
+
+// delete studio
+app.delete("/studios/delete/:id", async (req, res) => {
+  const { id } = req.params;
+  const result = await studiosCollection.deleteOne({
+    _id: new ObjectId(id),
+  });
+  res.send(result);
+});
+
 // get featured studios
 app.get("/featured-studios", async (req, res) => {
   const cursor = studiosCollection.find({});
