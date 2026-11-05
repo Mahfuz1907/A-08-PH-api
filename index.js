@@ -106,7 +106,7 @@ app.delete("/studios/delete/:id", async (req, res) => {
 // get featured studios
 app.get("/featured-studios", async (req, res) => {
   const cursor = studiosCollection.find({});
-  const featuredStudios = await cursor.limit(6).toArray();
+  const featuredStudios = await cursor.sort({ _id: -1 }).limit(6).toArray();
   res.send(featuredStudios);
 });
 
@@ -138,6 +138,15 @@ app.get("/bookings/:id", async (req, res) => {
     _id: new ObjectId(id),
   });
   res.send(booking);
+});
+
+// delete bookings
+app.delete("/bookings/delete/:id", async (req, res) => {
+  const { id } = req.params;
+  const result = await bookingsCollection.deleteOne({
+    _id: new ObjectId(id),
+  });
+  res.send(result);
 });
 
 // app listen port
