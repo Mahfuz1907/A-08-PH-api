@@ -118,10 +118,35 @@ app.get("/categories", async (req, res) => {
   res.send(categories);
 });
 
-// post bookings
+// add bookings
 app.post("/add-bookings", async (req, res) => {
-  const booking = req.body;
-  const result = await bookingsCollection.insertOne(booking);
+  const newBooking = req.body;
+  const existingBookings = await bookingsCollection
+    .find({
+      studioId: newBooking.studioId,
+      bookingDate: newBooking.bookingDate,
+      status: { $ne: "Canceled" },
+    })
+    .toArray();
+
+  const isConflict = existingBookings.some((booking) => {
+    const existingStart = booking.startTime;
+    const existingEnd = booking.endTime;
+    const newStart = newBooking.startTime;
+    const newEnd = newBooking.endTime;
+
+    return existingStart < newEnd && existingEnd > newStart;
+  });
+
+  if (isConflict) {
+    return res.status(400).send({
+      success: false,
+      message: "This slot is already booked!",
+    });
+  }
+
+  const result = await bookingsCollection.insertOne(newBooking);
+
   res.send(result);
 });
 
