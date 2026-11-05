@@ -2,6 +2,7 @@ import express from "express";
 import { MongoClient, ObjectId } from "mongodb";
 import "dotenv/config";
 import cors from "cors";
+import { jwtVerify, createRemoteJWKSet } from "jose";
 
 // define express app and port
 const app = express();
@@ -33,6 +34,26 @@ const bookingsCollection = database.collection("bookings");
 const usersCollection = database.collection("user");
 
 // verify token
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+
+  const JWKS = createRemoteJWKSet(
+    new URL(`${process.env.FRONTEND_URL}/api/auth/jwks`),
+  );
+
+  const { payload } = await jwtVerify(token, JWKS);
+
+  next();
+};
 
 // home route
 app.get("/", async (req, res) => {
@@ -40,7 +61,7 @@ app.get("/", async (req, res) => {
 });
 
 // add-studio route
-app.post("/add-studio", async (req, res) => {
+app.post("/add-studio", verifyToken, async (req, res) => {
   const studio = req.body;
   const result = await studiosCollection.insertOne(studio);
   console.log(result);
@@ -64,14 +85,14 @@ app.get("/studios/:id", async (req, res) => {
 });
 
 // get studio by email
-app.get("/studios/email/:email", async (req, res) => {
+app.get("/studios/email/:email", verifyToken, async (req, res) => {
   const { email } = req.params;
   const studio = await studiosCollection.find({ hostEmail: email }).toArray();
   res.send(studio);
 });
 
 // edit studio
-app.put("/studios/edit/:id", async (req, res) => {
+app.put("/studios/edit/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
 
@@ -96,7 +117,7 @@ app.put("/studios/edit/:id", async (req, res) => {
 });
 
 // delete studio
-app.delete("/studios/delete/:id", async (req, res) => {
+app.delete("/studios/delete/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const result = await studiosCollection.deleteOne({
     _id: new ObjectId(id),
@@ -119,7 +140,7 @@ app.get("/categories", async (req, res) => {
 });
 
 // add bookings
-app.post("/add-bookings", async (req, res) => {
+app.post("/add-bookings", verifyToken, async (req, res) => {
   const newBooking = req.body;
   const existingBookings = await bookingsCollection
     .find({
@@ -151,14 +172,14 @@ app.post("/add-bookings", async (req, res) => {
 });
 
 // get bookings
-app.get("/bookings", async (req, res) => {
+app.get("/bookings", verifyToken, async (req, res) => {
   const cursor = bookingsCollection.find({});
   const bookings = await cursor.toArray();
   res.send(bookings);
 });
 
 // get bookings by id
-app.get("/bookings/:id", async (req, res) => {
+app.get("/bookings/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const booking = await bookingsCollection.findOne({
     _id: new ObjectId(id),
@@ -167,7 +188,7 @@ app.get("/bookings/:id", async (req, res) => {
 });
 
 // get bookings by user
-app.get("/bookings/user/:email", async (req, res) => {
+app.get("/bookings/user/:email", verifyToken, async (req, res) => {
   const { email } = req.params;
   const bookings = await bookingsCollection
     .find({
@@ -178,7 +199,7 @@ app.get("/bookings/user/:email", async (req, res) => {
 });
 
 // cancel booking
-app.patch("/bookings/cancel/:id", async (req, res) => {
+app.patch("/bookings/cancel/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const filter = { _id: new ObjectId(id) };
   const updateDoc = {
@@ -191,7 +212,7 @@ app.patch("/bookings/cancel/:id", async (req, res) => {
 });
 
 // delete bookings
-app.delete("/bookings/delete/:id", async (req, res) => {
+app.delete("/bookings/delete/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const result = await bookingsCollection.deleteOne({
     _id: new ObjectId(id),
@@ -200,14 +221,14 @@ app.delete("/bookings/delete/:id", async (req, res) => {
 });
 
 // get users
-app.get("/users", async (req, res) => {
+app.get("/users", verifyToken, async (req, res) => {
   const cursor = usersCollection.find({});
   const users = await cursor.toArray();
   res.send(users);
 });
 
 // get user by id
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const user = await usersCollection.findOne({
     _id: new ObjectId(id),
