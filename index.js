@@ -30,6 +30,7 @@ const database = mongoClient.db("studio-space");
 const studiosCollection = database.collection("studios");
 const categoriesCollection = database.collection("categories");
 const bookingsCollection = database.collection("bookings");
+const usersCollection = database.collection("user");
 
 // verify token
 
@@ -140,6 +141,17 @@ app.get("/bookings/:id", async (req, res) => {
   res.send(booking);
 });
 
+// get bookings by user
+app.get("/bookings/user/:email", async (req, res) => {
+  const { email } = req.params;
+  const bookings = await bookingsCollection
+    .find({
+      userEmail: email,
+    })
+    .toArray();
+  res.send(bookings);
+});
+
 // delete bookings
 app.delete("/bookings/delete/:id", async (req, res) => {
   const { id } = req.params;
@@ -147,6 +159,22 @@ app.delete("/bookings/delete/:id", async (req, res) => {
     _id: new ObjectId(id),
   });
   res.send(result);
+});
+
+// get users
+app.get("/users", async (req, res) => {
+  const cursor = usersCollection.find({});
+  const users = await cursor.toArray();
+  res.send(users);
+});
+
+// get user by id
+app.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const user = await usersCollection.findOne({
+    _id: new ObjectId(id),
+  });
+  res.send(user);
 });
 
 // app listen port
