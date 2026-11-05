@@ -152,6 +152,19 @@ app.get("/bookings/user/:email", async (req, res) => {
   res.send(bookings);
 });
 
+// cancel booking
+app.patch("/bookings/cancel/:id", async (req, res) => {
+  const { id } = req.params;
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      status: "Canceled",
+    },
+  };
+  const result = await bookingsCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
+
 // delete bookings
 app.delete("/bookings/delete/:id", async (req, res) => {
   const { id } = req.params;
